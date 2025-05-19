@@ -225,11 +225,11 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
             name="productId"
             render={({ field }) => (
               <FormItem className="md:col-span-2">
-                <FormLabel>Product</FormLabel>
+                <FormLabel>Produit</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select product" />
+                      <SelectValue placeholder="Sélectionner produit" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -254,7 +254,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
             name="quantity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quantity</FormLabel>
+                <FormLabel>Quantité</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -273,7 +273,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
             name="discount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Discount (%)</FormLabel>
+                <FormLabel>Réduction (%)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -293,7 +293,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
           onClick={form.handleSubmit(addItem)}
           className="mt-4"
         >
-          Add Item
+          Ajouter produit
         </Button>
       </Form>
 
@@ -302,10 +302,10 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Qty</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Discount</TableHead>
+                <TableHead>Produit</TableHead>
+                <TableHead>Quantité</TableHead>
+                <TableHead>Prix</TableHead>
+                <TableHead>Réduction</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
@@ -350,7 +350,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
                 onClick={() => handleCreateOrder(false)}
               >
                 <Printer className="h-4 w-4" />
-                Generate Invoice
+                Génèrer facture
               </Button>
             </div>
           </div>

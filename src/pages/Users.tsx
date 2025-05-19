@@ -97,7 +97,7 @@ const Users = () => {
         <h1 className="text-2xl font-bold">Gestion des Utilisateurs</h1>
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button className="flex gap-2">
+            <Button className="w-25 bg-vente-primary hover:bg-vente-accent">
               <UserPlus size={18} />
               Ajouter un utilisateur
             </Button>

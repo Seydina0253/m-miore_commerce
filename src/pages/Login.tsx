@@ -59,14 +59,14 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-vente-primary">VenteBon</h1>
+          <h1 className="text-2xl font-bold text-vente-primary">ENTREPRISE ***</h1>
           <p className="mt-2 text-gray-600">Connectez-vous à votre compte</p>
         </div>
 
         <div className="mt-8">
-          <div className="bg-vente-light p-4 rounded-md text-sm text-gray-700 mb-6">
-            <h3 className="font-medium text-vente-primary mb-2">Comptes de Démonstration:</h3>
-            <p className="mt-2 text-xs text-gray-500">N'importe quel mot de passe fonctionnera pour la démonstration</p>
+          <div className="bg-vente-light p-4 rounded-md text-sm text-gray-900 mb-6">
+            <h3 className="font-medium text-vente-primary mb-2">    BIENVENUE</h3>
+            <p className="mt-2 text-xs text-gray-1300">Veuillez remplir correctement vos informations pour accéder à votre page de travail !!!</p>
           </div>
 
           <Form {...form}>
@@ -79,7 +79,7 @@ const Login: React.FC = () => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="exemple@societe.com"
+                        placeholder="nom@gmail.com"
                         type="email"
                         {...field}
                       />

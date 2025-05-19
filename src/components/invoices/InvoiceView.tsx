@@ -100,7 +100,7 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ invoice, onClose }) => {
       <CardHeader className="border-b">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-xl">Invoice #{invoice.invoiceNumber}</CardTitle>
+            <CardTitle className="text-xl">facture #{invoice.invoiceNumber}</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               Date: {formatDate(invoice.date)}
             </p>
@@ -123,20 +123,17 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ invoice, onClose }) => {
       </CardHeader>
       
       <CardContent className="pt-6 space-y-6">
-        <div className="border-b pb-4">
-          <h3 className="font-medium">Customer Information</h3>
-          <p className="text-sm text-muted-foreground">Walk-in Customer</p>
-        </div>
+        
 
         <div>
-          <h3 className="font-medium mb-3">Order Items</h3>
+          <h3 className="font-medium mb-3">Commande des produits </h3>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Unit Price</TableHead>
-                <TableHead className="text-right">Discount</TableHead>
+                <TableHead>Produit</TableHead>
+                <TableHead className="text-right">Quantité</TableHead>
+                <TableHead className="text-right">Prix unitaire</TableHead>
+                <TableHead className="text-right">Réduction</TableHead>
                 <TableHead className="text-right">Total</TableHead>
               </TableRow>
             </TableHeader>
@@ -155,7 +152,7 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ invoice, onClose }) => {
         </div>
 
         <div className="flex justify-between items-center pt-4 border-t">
-          <div className="font-medium">Total Amount</div>
+          <div className="font-medium">Montant total</div>
           <div className="text-xl font-bold">
             {formatCurrency(invoice.total)}
           </div>
@@ -173,9 +170,9 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ invoice, onClose }) => {
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="pending">En attente</SelectItem>
+              <SelectItem value="paid">Payé</SelectItem>
+              <SelectItem value="cancelled">Annulé</SelectItem>
             </SelectContent>
           </Select>
           <Button 
@@ -186,21 +183,21 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ invoice, onClose }) => {
           </Button>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" onClick={onClose}>Back</Button>
+          <Button variant="outline" onClick={onClose}>Retour</Button>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
             onClick={handlePrint}
           >
             <Printer className="h-4 w-4" />
-            Print
+            Imprimer
           </Button>
           <Button 
             className="flex items-center gap-2"
             onClick={handleGeneratePDF}
           >
             <FileText className="h-4 w-4" />
-            Generate PDF
+            Générer PDF
           </Button>
         </div>
       </CardFooter>

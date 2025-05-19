@@ -110,19 +110,19 @@ const Products = () => {
     <MainLayout requiredRole="admin">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-vente-dark">Products</h1>
+          <h1 className="text-2xl font-bold text-vente-dark">Liste des produits</h1>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-vente-primary hover:bg-vente-accent">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Product
+                Ajouter un produit
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingProduct ? "Edit Product" : "Add New Product"}
+                  {editingProduct ? "Modifier produit" : "Ajouter un nouveau produit"}
                 </DialogTitle>
               </DialogHeader>
               <ProductForm
@@ -137,7 +137,7 @@ const Products = () => {
           <div className="relative flex-1">
             <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search products..."
+              placeholder="Rechercher produits..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -149,8 +149,8 @@ const Products = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Price</TableHead>
+                <TableHead>Nom</TableHead>
+                <TableHead>Prix</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -194,7 +194,7 @@ const Products = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-4 text-gray-500">
-                    No products found
+                    Aucun produit trouvé
                   </TableCell>
                 </TableRow>
               )}

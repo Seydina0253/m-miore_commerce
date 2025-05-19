@@ -28,7 +28,7 @@ const Sidebar = () => {
     <div className="w-64 flex-shrink-0 hidden md:block bg-white border-r border-gray-200 shadow-sm">
       <div className="flex flex-col h-full">
         <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-vente-primary">VenteBon System</h2>
+          <h2 className="text-xl font-bold text-vente-primary">ENTREPRISE ***</h2>
         </div>
         
         <div className="p-4 border-b border-gray-200">
@@ -46,24 +46,24 @@ const Sidebar = () => {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <NavLink to="/dashboard" className={navLinkClass}>
             <Home size={18} />
-            <span>Dashboard</span>
+            <span>Tableau de Bord</span>
           </NavLink>
           
           {user?.role === "admin" && (
             <>
               <NavLink to="/products" className={navLinkClass}>
                 <Package size={18} />
-                <span>Products</span>
+                <span>Produits</span>
               </NavLink>
               
               <NavLink to="/users" className={navLinkClass}>
                 <Users size={18} />
-                <span>Users</span>
+                <span>Utilisateurs</span>
               </NavLink>
               
               <NavLink to="/statistics" className={navLinkClass}>
                 <BarChart4 size={18} />
-                <span>Statistics</span>
+                <span>Statistiques</span>
               </NavLink>
             </>
           )}
@@ -72,12 +72,12 @@ const Sidebar = () => {
             <>
               <NavLink to="/sales" className={navLinkClass}>
                 <ShoppingCart size={18} />
-                <span>Sales</span>
+                <span>Ventes</span>
               </NavLink>
               
               <NavLink to="/invoices" className={navLinkClass}>
                 <FileText size={18} />
-                <span>Invoices</span>
+                <span>Factures</span>
               </NavLink>
             </>
           )}
@@ -86,12 +86,12 @@ const Sidebar = () => {
             <>
               <NavLink to="/payments" className={navLinkClass}>
                 <CreditCard size={18} />
-                <span>Payments</span>
+                <span>Paiement des Factures</span>
               </NavLink>
               
               <NavLink to="/vouchers" className={navLinkClass}>
                 <Receipt size={18} />
-                <span>Process Vouchers</span>
+                <span>Paiement des Bons </span>
               </NavLink>
             </>
           )}
@@ -99,7 +99,7 @@ const Sidebar = () => {
           {user?.role === "gestionnaire_bon" && (
             <NavLink to="/manage-vouchers" className={navLinkClass}>
               <Receipt size={18} />
-              <span>Manage Vouchers</span>
+              <span>Gestion des Bons</span>
             </NavLink>
           )}
         </nav>

@@ -110,18 +110,11 @@ const Sales = () => {
       <div className="space-y-6">
         <div className="flex flex-wrap justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Sales</h1>
-            <p className="text-muted-foreground">Create and manage customer orders</p>
+            <h1 className="text-2xl font-bold">Ventes</h1>
+            <p className="text-muted-foreground">Créer et gérer les commandes des clients</p>
           </div>
           
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={handleViewAllInvoices}
-          >
-            <FileText className="h-4 w-4" />
-            View All Invoices
-          </Button>
+           
         </div>
 
         {currentOrder ? (
@@ -129,7 +122,7 @@ const Sales = () => {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle>Invoice #{currentOrder.invoiceNumber}</CardTitle>
+                  <CardTitle>Facture #{currentOrder.invoiceNumber}</CardTitle>
                   <CardDescription>
                     {format(new Date(currentOrder.date), 'PPPPp', { locale: fr })}
                   </CardDescription>
@@ -144,7 +137,7 @@ const Sales = () => {
               
 
               <div>
-                <h3 className="font-medium mb-3">Order Items</h3>
+                <h3 className="font-medium mb-3">Commandes produits</h3>
                 <div className="space-y-3">
                   {currentOrder.items.map((item, index) => (
                     <div key={index} className="flex justify-between py-2 border-b">
@@ -164,7 +157,7 @@ const Sales = () => {
               </div>
 
               <div className="flex justify-between items-center pt-4 border-t">
-                <div className="font-medium">Total Amount</div>
+                <div className="font-medium">Montant Total</div>
                 <div className="text-xl font-bold">
                   {formatCurrency(currentOrder.total)}
                 </div>
@@ -173,7 +166,7 @@ const Sales = () => {
 
             <CardFooter className="flex justify-between print:hidden">
               <Button variant="outline" onClick={handleNewSale}>
-                New Sale
+                Nouvelle Vente
               </Button>
               
               <div className="flex gap-3">
@@ -183,16 +176,10 @@ const Sales = () => {
                   className="flex items-center gap-2"
                 >
                   <Printer className="h-4 w-4" />
-                  {currentOrder.printed ? "Print Again" : "Print Invoice"}
+                  {currentOrder.printed ? "Print Again" : "Imprimer la facture"}
                 </Button>
                 
-                <Button 
-                  onClick={handleViewAllInvoices}
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  View All Invoices
-                </Button>
+                
               </div>
             </CardFooter>
           </Card>

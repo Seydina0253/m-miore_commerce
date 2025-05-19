@@ -51,7 +51,7 @@ export const UserForm: React.FC<UserFormProps> = ({ user, onSubmit }) => {
             <FormItem>
               <FormLabel>Nom</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Votre nom" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -65,7 +65,7 @@ export const UserForm: React.FC<UserFormProps> = ({ user, onSubmit }) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="user@example.com" {...field} />
+                <Input placeholder="nom@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

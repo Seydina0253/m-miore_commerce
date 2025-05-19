@@ -52,9 +52,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Product Name</FormLabel>
+              <FormLabel>Nom du produit</FormLabel>
               <FormControl>
-                <Input placeholder="Enter product name" {...field} />
+                <Input placeholder="Entrer nom du produit" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +66,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>Prix</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -106,8 +106,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          {product ? "Update Product" : "Add Product"}
+        <Button type="submit" className="w-full bg-vente-primary hover:bg-vente-accent">
+          {product ? "Modifier Produit" : "Ajouter Produit"}
         </Button>
       </form>
     </Form>

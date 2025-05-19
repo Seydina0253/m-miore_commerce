@@ -223,53 +223,32 @@ const Invoices = () => {
       <div className="space-y-6">
         <div className="flex flex-wrap justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Invoices</h1>
-            <p className="text-muted-foreground mt-1">Manage, view and print your invoices</p>
+            <h1 className="text-2xl font-bold">Factures</h1>
+            <p className="text-muted-foreground mt-1">Gérer la visualisation et l'impression de vos factures</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Total Invoices</CardTitle>
-              <CardDescription>All invoices</CardDescription>
+              <CardTitle className="text-lg">Total des factures</CardTitle>
+              <CardDescription>Toutes les factures</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">{invoiceSummary.printedCount + invoiceSummary.unprintedCount}</p>
-              <p className="text-muted-foreground">Total value: {formatCurrency(invoiceSummary.totalAmount)}</p>
+              <p className="text-muted-foreground">Valeur total: {formatCurrency(invoiceSummary.totalAmount)}</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Printed Invoices</CardTitle>
-              <CardDescription>Already printed</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{invoiceSummary.printedCount}</p>
-              <p className="text-muted-foreground">Total value: {formatCurrency(invoiceSummary.totalPrinted)}</p>
-            </CardContent>
-          </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Unprinted Invoices</CardTitle>
-              <CardDescription>Waiting to be printed</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{invoiceSummary.unprintedCount}</p>
-              <p className="text-muted-foreground">
-                Total value: {formatCurrency(invoiceSummary.totalAmount - invoiceSummary.totalPrinted)}
-              </p>
-            </CardContent>
-          </Card>
+          
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="mb-4">
-            <TabsTrigger value="all">All Invoices</TabsTrigger>
-            <TabsTrigger value="unprinted">Unprinted</TabsTrigger>
-            <TabsTrigger value="printed">Printed</TabsTrigger>
+            <TabsTrigger value="all">Toutes les factures</TabsTrigger>
+            <TabsTrigger value="unprinted">Non imprimer</TabsTrigger>
+            <TabsTrigger value="printed">Imprimer</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-0">
@@ -280,7 +259,7 @@ const Invoices = () => {
                     <TableRow>
                       <TableHead className="cursor-pointer" onClick={() => handleSort("invoice_number")}>
                         <div className="flex items-center">
-                          Invoice #
+                          Facture #
                           {getSortIcon("invoice_number")}
                         </div>
                       </TableHead>
@@ -292,7 +271,7 @@ const Invoices = () => {
                       </TableHead>
                       <TableHead className="cursor-pointer" onClick={() => handleSort("total")}>
                         <div className="flex items-center">
-                          Amount
+                          Montant
                           {getSortIcon("total")}
                         </div>
                       </TableHead>
@@ -304,7 +283,7 @@ const Invoices = () => {
                       </TableHead>
                       <TableHead className="cursor-pointer" onClick={() => handleSort("printed")}>
                         <div className="flex items-center">
-                          Printed
+                          Imprimer
                           {getSortIcon("printed")}
                         </div>
                       </TableHead>
@@ -315,7 +294,7 @@ const Invoices = () => {
                     {isLoading ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8">
-                          Loading invoices...
+                          Chargement des factures...
                         </TableCell>
                       </TableRow>
                     ) : invoices.length > 0 ? (
@@ -332,11 +311,11 @@ const Invoices = () => {
                           <TableCell>
                             {invoice.printed ? (
                               <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Yes
+                                Oui
                               </span>
                             ) : (
                               <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                                No
+                                Non
                               </span>
                             )}
                           </TableCell>
@@ -349,20 +328,10 @@ const Invoices = () => {
                                 onClick={() => handleViewInvoice(invoice.id)}
                               >
                                 <Eye className="h-3 w-3" />
-                                <span className="hidden sm:inline">View</span>
+                                <span className="hidden sm:inline">Voir</span>
                               </Button>
                               
-                              <Button 
-                                size="sm"
-                                className="flex items-center gap-1" 
-                                onClick={() => handlePrintInvoice(invoice.id)}
-                                variant={invoice.printed ? "outline" : "default"}
-                              >
-                                <Printer className="h-3 w-3" />
-                                <span className="hidden sm:inline">
-                                  {invoice.printed ? "Print Again" : "Print"}
-                                </span>
-                              </Button>
+                              
                             </div>
                           </TableCell>
                         </TableRow>
@@ -370,7 +339,7 @@ const Invoices = () => {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8">
-                          No invoices found
+                          Aucune facture trouvée 
                         </TableCell>
                       </TableRow>
                     )}
@@ -698,7 +667,7 @@ const Invoices = () => {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8">
-                          No printed invoices found
+                          Aucune facture imprimée trouvée
                         </TableCell>
                       </TableRow>
                     )}
@@ -768,7 +737,7 @@ const Invoices = () => {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>Invoice Details</DialogTitle>
+              <DialogTitle>Détails facture</DialogTitle>
             </DialogHeader>
             {selectedInvoice && <InvoiceView invoice={selectedInvoice} onClose={handleCloseInvoice} />}
           </DialogContent>

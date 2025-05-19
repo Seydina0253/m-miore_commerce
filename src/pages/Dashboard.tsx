@@ -75,7 +75,7 @@ const Dashboard = () => {
           <StatsCard
             title="Bons"
             value={stats ? stats.vouchersCount : "0"}
-            icon={<Receipt className="h-5 w-5" />}
+            icon={<span className="h-5 w-5">XAF</span>}
             isLoading={isLoading}
           />
         </div>

@@ -179,7 +179,7 @@ const Payments: React.FC = () => {
                         <FormItem>
                           <FormLabel>Numéro de Facture</FormLabel>
                           <FormControl>
-                            <Input placeholder="ex: INV-20240514-001" {...field} />
+                            <Input placeholder="ex: FAC-20240514-001" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -195,7 +195,7 @@ const Payments: React.FC = () => {
             </CardContent>
             {!currentOrder && (
               <CardFooter className="text-sm text-gray-500">
-                Entrez le numéro de facture exact (ex: INV-20240514-001)
+                Entrez le numéro de facture exact (ex: FAC-20240514-001)
               </CardFooter>
             )}
           </Card>
