@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +24,6 @@ const Sales = () => {
   
   const handleCreateOrder = async (items: OrderItem[], saveAsDraft: boolean = false) => {
     try {
-      console.log("Sending order data to backend:", { items, saveAsDraft });
       const response = await axios.post("http://localhost/Backend_Mem/orders.php", {
         items: items.map(item => ({
           productId: parseInt(item.productId), 
@@ -36,7 +34,6 @@ const Sales = () => {
         })),
         saveAsDraft 
       });
-      console.log("Order creation response:", response.data);
 
       const newOrder: Order = {
         id: response.data.order.id.toString(),
@@ -66,7 +63,6 @@ const Sales = () => {
     if (!currentOrder) return;
     
     try {
-      // Mark the invoice as printed in the database
       await axios.put(`http://localhost/Backend_Mem/invoices.php`, {
         id: currentOrder.id,
         printed: true
@@ -74,7 +70,6 @@ const Sales = () => {
       
       window.print();
       
-      // Update local state
       setCurrentOrder({
         ...currentOrder,
         printed: true
@@ -84,7 +79,6 @@ const Sales = () => {
     } catch (error) {
       console.error("Error marking invoice as printed:", error);
       toast.error("Failed to update invoice status");
-      // Still allow printing even if the status update fails
       window.print();
     }
   };
@@ -113,8 +107,6 @@ const Sales = () => {
             <h1 className="text-2xl font-bold">Ventes</h1>
             <p className="text-muted-foreground">Créer et gérer les commandes des clients</p>
           </div>
-          
-           
         </div>
 
         {currentOrder ? (
@@ -134,8 +126,6 @@ const Sales = () => {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              
-
               <div>
                 <h3 className="font-medium mb-3">Commandes produits</h3>
                 <div className="space-y-3">
@@ -178,8 +168,6 @@ const Sales = () => {
                   <Printer className="h-4 w-4" />
                   {currentOrder.printed ? "Print Again" : "Imprimer la facture"}
                 </Button>
-                
-                
               </div>
             </CardFooter>
           </Card>

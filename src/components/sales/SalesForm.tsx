@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -69,7 +68,6 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
       const response = await axios.get("http://localhost/Backend_Mem/products.php");
       setProducts(response.data);
       
-      // Initialize local stock tracking
       const stockMap: Record<string, number> = {};
       response.data.forEach((product: Product) => {
         stockMap[product.id] = product.stock;
@@ -94,22 +92,20 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
         return false;
       }
 
-      // Update stock in database
       await axios.put(`http://localhost/Backend_Mem/products.php`, {
         id: productId,
         name: product.name,
-        price: product.price,
+        purchase_price: product.purchase_price,
+        selling_price: product.selling_price,
         stock: newStock
       });
 
-      // Update local product state
       setProducts(prevProducts => 
         prevProducts.map(p => 
           p.id === productId ? { ...p, stock: newStock } : p
         )
       );
 
-      // Update local stock tracking
       setLocalProductStock(prev => ({
         ...prev,
         [productId]: newStock
@@ -131,7 +127,6 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
       return;
     }
 
-    // Use local tracking for stock check
     const currentStock = localProductStock[values.productId] ?? selectedProduct.stock;
     
     if (values.quantity > currentStock) {
@@ -139,19 +134,18 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
       return;
     }
 
-    // Update the stock first
     const stockUpdated = await updateProductStock(values.productId, values.quantity);
     if (!stockUpdated) return;
 
     const itemTotal = parseFloat(
-      (selectedProduct.price * values.quantity * (1 - values.discount / 100)).toFixed(2)
+      (selectedProduct.selling_price * values.quantity * (1 - values.discount / 100)).toFixed(2)
     );
 
     const newItem: OrderItem = {
       productId: selectedProduct.id.toString(),
       productName: selectedProduct.name,
       quantity: values.quantity,
-      unitPrice: selectedProduct.price,
+      unitPrice: selectedProduct.selling_price,
       discount: values.discount,
       total: itemTotal,
     };
@@ -163,35 +157,31 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
   const removeItem = async (index: number) => {
     const item = items[index];
     
-    // Restore the stock when removing an item
     try {
       const product = products.find(p => p.id.toString() === item.productId);
       if (!product) return;
       
       const newStock = (localProductStock[item.productId] ?? product.stock) + item.quantity;
       
-      // Update stock in database
       await axios.put(`http://localhost/Backend_Mem/products.php`, {
         id: item.productId,
         name: product.name,
-        price: product.price,
+        purchase_price: product.purchase_price,
+        selling_price: product.selling_price,
         stock: newStock
       });
       
-      // Update local product state
       setProducts(prevProducts => 
         prevProducts.map(p => 
           p.id === item.productId ? { ...p, stock: newStock } : p
         )
       );
       
-      // Update local stock tracking
       setLocalProductStock(prev => ({
         ...prev,
         [item.productId]: newStock
       }));
       
-      // Remove item from list
       setItems(prev => prev.filter((_, i) => i !== index));
     } catch (error) {
       console.error("Error restoring product stock:", error);
@@ -239,7 +229,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
                         value={product.id.toString()}
                         disabled={(localProductStock[product.id] ?? product.stock) <= 0}
                       >
-                        {product.name} ({formatCurrency(product.price)}) - Stock: {localProductStock[product.id] ?? product.stock}
+                        {product.name} ({formatCurrency(product.selling_price)}) - Stock: {localProductStock[product.id] ?? product.stock}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -258,9 +248,9 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
                 <FormControl>
                   <Input
                     type="number"
-                    min={1}
+                    min={0}
                     {...field}
-                    onChange={e => field.onChange(parseInt(e.target.value) || 1)}
+                    onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -337,14 +327,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
               Total: {formatCurrency(items.reduce((sum, item) => sum + item.total, 0))}
             </div>
             <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2"
-                onClick={() => handleCreateOrder(true)}
-              >
-                <FileText className="h-4 w-4" />
-                Save as Draft
-              </Button>
+              
               <Button 
                 className="flex items-center gap-2"
                 onClick={() => handleCreateOrder(false)}

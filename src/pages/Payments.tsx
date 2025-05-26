@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
-import { Order } from "@/types";
+import { Order, ProductProfit } from "@/types";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import CashDrawer from "@/components/CashDrawer";
+import ProductProfitTable from "@/components/ProductProfitTable";
 
 const formSchema = z.object({
   invoiceNumber: z.string().min(1, "Le numéro de facture est requis"),
@@ -35,6 +36,7 @@ type PaymentFormValues = z.infer<typeof formSchema>;
 const Payments: React.FC = () => {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [profits, setProfits] = useState<ProductProfit[]>([]);
   
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(formSchema),
@@ -42,6 +44,22 @@ const Payments: React.FC = () => {
       invoiceNumber: "",
     },
   });
+
+  useEffect(() => {
+    const fetchProfits = async () => {
+      try {
+        const response = await axios.get("http://localhost/Backend_Mem/profits.php");
+        setProfits(response.data);
+      } catch (error) {
+        console.error("Error fetching profits:", error);
+        toast.error("Failed to fetch profit data");
+      }
+    };
+
+    fetchProfits();
+    const interval = setInterval(fetchProfits, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const onSubmit = async (values: PaymentFormValues) => {
     try {
@@ -91,6 +109,17 @@ const Payments: React.FC = () => {
       setIsProcessing(false);
     }
   };
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await axios.delete(`http://localhost/Backend_Mem/products.php?id=${productId}`);
+      setProfits(prev => prev.filter(p => p.productId !== productId));
+      toast.success("Produit supprimé avec succès");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("Échec de la suppression du produit");
+    }
+  };
   
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-CM", {
@@ -119,90 +148,94 @@ const Payments: React.FC = () => {
           <p className="text-muted-foreground mt-1">Traiter les paiements des clients</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <CashDrawer className="col-span-1" />
-          
-          <Card className="col-span-1 md:col-span-2">
-            <CardHeader>
-              <CardTitle>Traiter un Paiement</CardTitle>
-              <CardDescription>Entrez un numéro de facture pour traiter le paiement</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {currentOrder ? (
-                <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-md">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-semibold">Facture {currentOrder.invoiceNumber}</h3>
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
-                        En attente de paiement
-                      </span>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Changement de 3 à 4 colonnes */}
+            <CashDrawer className="col-span-1 md:col-span-2" /> {/* Caisse agrandie (3 colonnes au lieu de 1) */}
+            
+            <Card className="col-span-2"> {/* Formulaire réduit à 1 colonne */}
+              <CardHeader>
+                <CardTitle>Traiter un Paiement</CardTitle>
+                <CardDescription>Entrez un numéro de facture pour traiter le paiement</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {currentOrder ? (
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 p-4 rounded-md">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="font-semibold">Facture {currentOrder.invoiceNumber}</h3>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
+                          En attente de paiement
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">Date: {formatDate(currentOrder.date)}</p>
                     </div>
-                    <p className="text-sm text-gray-600">Date: {formatDate(currentOrder.date)}</p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2">Articles</h3>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {currentOrder.items.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm py-1 border-b border-gray-100">
-                          <span>
-                            {item.productName} × {item.quantity}
-                          </span>
-                          <span>{formatCurrency(item.total)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
-                    <span className="font-semibold">Montant Total</span>
-                    <span className="text-xl font-bold">{formatCurrency(currentOrder.total)}</span>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <Button 
-                      onClick={handleProcessPayment} 
-                      className="w-full bg-green-600 hover:bg-green-700"
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? "Traitement..." : "Traiter le Paiement"}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="invoiceNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Numéro de Facture</FormLabel>
-                          <FormControl>
-                            <Input placeholder="ex: FAC-20240514-001" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     
-                    <Button type="submit" className="bg-vente-primary hover:bg-vente-accent w-full">
-                      Rechercher la Facture
-                    </Button>
-                  </form>
-                </Form>
+                    <div>
+                      <h3 className="font-medium mb-2">Articles</h3>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {currentOrder.items.map((item, index) => (
+                          <div key={index} className="flex justify-between text-sm py-1 border-b border-gray-100">
+                            <span>
+                              {item.productName} × {item.quantity}
+                            </span>
+                            <span>{formatCurrency(item.total)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
+                      <span className="font-semibold">Montant Total</span>
+                      <span className="text-xl font-bold">{formatCurrency(currentOrder.total)}</span>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <Button 
+                        onClick={handleProcessPayment} 
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        disabled={isProcessing}
+                      >
+                        {isProcessing ? "Traitement..." : "Traiter le Paiement"}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="invoiceNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Numéro de Facture</FormLabel>
+                            <FormControl>
+                              <Input placeholder="ex: 0000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button type="submit" className="bg-vente-primary hover:bg-vente-accent w-full">
+                        Rechercher la Facture
+                      </Button>
+                    </form>
+                  </Form>
+                )}
+              </CardContent>
+              {!currentOrder && (
+                <CardFooter className="text-sm text-gray-500">
+                  Entrez le numéro de facture exact (ex: 0000)
+                </CardFooter>
               )}
-            </CardContent>
-            {!currentOrder && (
-              <CardFooter className="text-sm text-gray-500">
-                Entrez le numéro de facture exact (ex: FAC-20240514-001)
-              </CardFooter>
-            )}
-          </Card>
+            </Card>
+          </div>
+
+          
         </div>
       </div>
     </MainLayout>
   );
 };
 
-export default Payments; 
+export default Payments;

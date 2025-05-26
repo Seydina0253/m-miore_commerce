@@ -140,10 +140,10 @@ const ProcessVouchers: React.FC = () => {
           <p className="text-vente-gray mt-1">Traiter les bons de dépense et de sortie</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> 
-          <CashDrawer className="col-span-1" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Changé de 3 à 4 colonnes */}
+          <CashDrawer className="col-span-1 md:col-span-2" /> {/* Caisse agrandie (3 colonnes au lieu de 1) */}
           
-          <Card className="col-span-1 md:col-span-2">
+          <Card className="col-span-2"> {/* Formulaire réduit à 1 colonne */}
             <CardHeader>
               <CardTitle>Traiter un Bon</CardTitle>
               <CardDescription>Entrez un numéro de bon pour le traiter</CardDescription>
@@ -193,12 +193,12 @@ const ProcessVouchers: React.FC = () => {
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="voucher_number" // Change to voucher_number
+                      name="voucher_number"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Numéro de Bon</FormLabel>
                           <FormControl>
-                            <Input placeholder="ex: DEP-20240514-001" {...field} />
+                            <Input placeholder="ex: 0000" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -214,7 +214,7 @@ const ProcessVouchers: React.FC = () => {
             </CardContent>
             {!currentVoucher && (
               <CardFooter className="text-sm text-gray-500">
-                Entrez le numéro de bon exact (ex: DEP-20240514-001)
+                Entrez le numéro de bon exact (ex: 0000)
               </CardFooter>
             )}
           </Card>

@@ -49,82 +49,85 @@ const VoucherForm: React.FC<VoucherFormProps> = ({
 
   const handleSubmit = (values: VoucherFormValues) => {
     onSubmit(values);
+    form.reset(); // Réinitialise le formulaire après soumission
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type de Bon</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+    <div  className="col-span-1 md:col-span-4"> {/* Augmentez la largeur de la carte ici */}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type de Bon</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type de bon" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="expense">Bon de Dépense</SelectItem>
+                    <SelectItem value="output">Bon de Sortie</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Montant</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner le type de bon" />
-                  </SelectTrigger>
+                  <Input
+                    type="number"
+                    step="1"
+                    placeholder=""
+                    {...field}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="expense">Bon de Dépense</SelectItem>
-                  <SelectItem value="output">Bon de Sortie</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Montant</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Entrez la description du bon"
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Entrez la description du bon"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button
-          type="submit"
-          className="bg-vente-primary hover:bg-vente-accent w-full"
-          disabled={isLoading}
-        >
-          {isLoading ? "Création en cours..." : "Créer le Bon"}
-        </Button>
-      </form>
-    </Form>
+          <Button
+            type="submit"
+            className="bg-vente-primary hover:bg-vente-accent w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? "Création en cours..." : "Créer le Bon"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   ); 
 };
 

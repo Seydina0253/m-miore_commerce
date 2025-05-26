@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -8,17 +8,34 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
+import { fetchTopProductsData } from "@/services/statisticsService";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductsChart = () => {
-  // Données de démonstration
-  const data = [
-    { name: "Produit A", sales: 400 },
-    { name: "Produit B", sales: 300 },
-    { name: "Produit C", sales: 290 },
-    { name: "Produit D", sales: 200 },
-    { name: "Produit E", sales: 180 },
-  ];
+  const [data, setData] = useState<Array<{ name: string; sales: number }>>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const productsData = await fetchTopProductsData();
+        setData(productsData);
+      } catch (error) {
+        console.error("Erreur de chargement des données:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (isLoading) {
+    return <Skeleton className="h-80 w-full" />;
+  }
 
   return (
     <div className="h-80">
@@ -36,7 +53,8 @@ const ProductsChart = () => {
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip formatter={(value) => `${value} unités`} />
-          <Bar dataKey="sales" fill="#6366F1" radius={[4, 4, 0, 0]} />
+          <Legend />
+          <Bar dataKey="sales" name="Ventes" fill="#6366F1" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

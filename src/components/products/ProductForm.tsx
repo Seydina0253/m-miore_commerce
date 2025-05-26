@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -17,8 +16,12 @@ import { Product } from '@/types';
 
 const formSchema = z.object({
   name: z.string().min(2, "Product name is required"),
-  price: z.coerce.number().min(0, "Price must be a positive number"),
+  purchase_price: z.coerce.number().min(0, "Purchase price must be a positive number"),
+  selling_price: z.coerce.number().min(0, "Selling price must be a positive number"),
   stock: z.coerce.number().min(0, "Stock must be a non-negative number"),
+}).refine(data => data.selling_price > data.purchase_price, {
+  message: "Selling price must be greater than purchase price",
+  path: ["selling_price"],
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -34,12 +37,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
     defaultValues: product
       ? {
           name: product.name,
-          price: product.price,
+          purchase_price: product.purchase_price,
+          selling_price: product.selling_price,
           stock: product.stock,
         }
       : {
           name: "",
-          price: 0,
+          purchase_price: 0,
+          selling_price: 0,
           stock: 0,
         },
   });
@@ -63,16 +68,39 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
 
         <FormField
           control={form.control}
-          name="price"
+          name="purchase_price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Prix</FormLabel>
+              <FormLabel>Prix d'achat</FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   min="0"
-                  step="0.01"
-                  placeholder="0.00"
+                  step="1"
+                  placeholder=""
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(parseFloat(e.target.value) || 0);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="selling_price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Prix de vente</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder=""
                   {...field}
                   onChange={(e) => {
                     field.onChange(parseFloat(e.target.value) || 0);

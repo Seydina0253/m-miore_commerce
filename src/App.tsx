@@ -20,6 +20,7 @@ import Statistics from "./pages/Statistics";
 import Invoices from "./pages/Invoices";
 import InvoiceDetail from "./pages/InvoiceDetail";
 
+
 const queryClient = new QueryClient();
 
 const App = () => (

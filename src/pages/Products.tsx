@@ -38,9 +38,13 @@ const Products = () => {
 
   const handleAddProduct = async (data: Omit<Product, "id">) => {
     try {
-      // Validation du stock
       if (data.stock < 0) {
         toast.error("Stock cannot be negative");
+        return;
+      }
+
+      if (data.selling_price <= data.purchase_price) {
+        toast.error("Le prix de vente doit être supérieur au prix d'achat");
         return;
       }
 
@@ -58,9 +62,13 @@ const Products = () => {
     if (!editingProduct) return;
 
     try {
-      // Validation du stock
       if (data.stock < 0) {
         toast.error("Stock cannot be negative");
+        return;
+      }
+
+      if (data.selling_price <= data.purchase_price) {
+        toast.error("Le prix de vente doit être supérieur au prix d'achat");
         return;
       }
 
@@ -150,7 +158,8 @@ const Products = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nom</TableHead>
-                <TableHead>Prix</TableHead>
+                <TableHead>Prix d'achat</TableHead>
+                <TableHead>Prix de vente</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -160,7 +169,8 @@ const Products = () => {
                 filteredProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{formatCurrency(product.price)}</TableCell>
+                    <TableCell>{formatCurrency(product.purchase_price)}</TableCell>
+                    <TableCell>{formatCurrency(product.selling_price)}</TableCell>
                     <TableCell>
                       <span className={product.stock <= 5 ? "text-red-500 font-bold" : ""}>
                         {product.stock}
@@ -193,7 +203,7 @@ const Products = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                  <TableCell colSpan={5} className="text-center py-4 text-gray-500">
                     Aucun produit trouvé
                   </TableCell>
                 </TableRow>
@@ -206,4 +216,4 @@ const Products = () => {
   );
 };
 
-export default Products; 
+export default Products;

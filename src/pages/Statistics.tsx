@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ChartBarIcon, TrendingUpIcon, CreditCardIcon, PackageIcon } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import StatsCard from "@/components/dashboard/StatsCard";
@@ -7,14 +7,39 @@ import SalesChart from "@/components/statistics/SalesChart";
 import ProductsChart from "@/components/statistics/ProductsChart";
 import PaymentsTable from "@/components/statistics/PaymentsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchStatisticsData, StatisticsData } from "@/services/statisticsService";
 
 const Statistics = () => {
-  // Données de démonstration
-  const stats = {
-    totalSales: "45,678 €",
-    averageOrderValue: "124 €",
-    totalProducts: 234,
-    conversionRate: "8.5%"
+  const [stats, setStats] = useState<StatisticsData>({
+    totalSales: 0,
+    averageOrderValue: 0,
+    totalProducts: 0,
+    conversionRate: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const statsData = await fetchStatisticsData();
+        setStats(statsData);
+      } catch (error) {
+        console.error("Erreur de chargement des statistiques:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("fr-CM", {
+      style: "currency",
+      currency: "XAF",
+      minimumFractionDigits: 0
+    }).format(amount);
   };
 
   return (
@@ -30,27 +55,31 @@ const Statistics = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Ventes totales"
-            value={stats.totalSales}
-            icon={<TrendingUpIcon className="text-vente-primary" />}
+            value={isLoading ? "Chargement..." : formatCurrency(stats.totalSales)}
+            icon={<TrendingUpIcon className="text-blue-600" />}
             trend={{ value: 12, isPositive: true }}
+            isLoading={isLoading}
           />
           <StatsCard
             title="Valeur moyenne des commandes"
-            value={stats.averageOrderValue}
-            icon={<CreditCardIcon className="text-vente-primary" />}
+            value={isLoading ? "Chargement..." : formatCurrency(stats.averageOrderValue)}
+            icon={<CreditCardIcon className="text-blue-600" />}
             trend={{ value: 8, isPositive: true }}
+            isLoading={isLoading}
           />
           <StatsCard
             title="Produits actifs"
-            value={stats.totalProducts}
-            icon={<PackageIcon className="text-vente-primary" />}
+            value={isLoading ? "Chargement..." : stats.totalProducts.toString()}
+            icon={<PackageIcon className="text-blue-600" />}
             trend={{ value: 4, isPositive: true }}
+            isLoading={isLoading}
           />
           <StatsCard
             title="Taux de conversion"
-            value={stats.conversionRate}
-            icon={<ChartBarIcon className="text-vente-primary" />}
+            value={isLoading ? "Chargement..." : `${stats.conversionRate}%`}
+            icon={<ChartBarIcon className="text-blue-600" />}
             trend={{ value: 2, isPositive: false }}
+            isLoading={isLoading}
           />
         </div>
 
@@ -74,14 +103,7 @@ const Statistics = () => {
           </Card>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Derniers paiements</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PaymentsTable />
-          </CardContent>
-        </Card>
+        
       </div>
     </MainLayout>
   );

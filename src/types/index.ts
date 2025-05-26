@@ -10,7 +10,8 @@ export interface User {
 export interface Product {
   id: string;
   name: string;
-  price: number;
+  purchase_price: number;
+  selling_price: number;
   stock: number;
 }
 
@@ -31,6 +32,15 @@ export interface Order {
   invoiceNumber: string;
   status: "pending" | "paid" | "cancelled";
   printed?: boolean;
+}
+export interface ProductProfit {
+  productId: string;
+  productName: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  quantitySold: number;
+  totalRevenue: number;
+  totalProfit: number;
 }
 export interface Invoice extends Order {
   // À ajouter si vous avez besoin de données supplémentaires pour les factures
