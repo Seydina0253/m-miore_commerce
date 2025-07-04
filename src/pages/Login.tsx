@@ -71,7 +71,7 @@ const Login = () => {
           <div className="text-center mb-8">
             
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-              ENTREPRISE 
+              KHEWEUL SARL 
             </h1>
             <p className="text-gray-600 text-lg">Connectez-vous à votre espace</p>
           </div>

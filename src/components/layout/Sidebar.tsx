@@ -1,3 +1,4 @@
+
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +11,8 @@ import {
   Receipt, 
   Users, 
   BarChart4, 
-  LogOut 
+  LogOut,
+  Calculator
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -114,7 +116,12 @@ const Sidebar = () => {
               
               <NavLink to="/vouchers" className={navLinkClass}>
                 <Receipt size={20} className={iconClass} />
-                <span className="font-medium">Paiement de Bon</span>
+                <span className="font-medium">Réglement de Bon</span>
+              </NavLink>
+              
+              <NavLink to="/bilan" className={navLinkClass}>
+                <Calculator size={20} className={iconClass} />
+                <span className="font-medium">Bilan</span>
               </NavLink>
             </div>
           )}

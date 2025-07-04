@@ -13,12 +13,14 @@ import Sales from "./pages/Sales";
 import Payments from "./pages/Payments";
 import ProcessVouchers from "./pages/ProcessVouchers";
 import ManageVouchers from "./pages/ManageVouchers";
+import Bilan from "./pages/Bilan";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import Statistics from "./pages/Statistics";
 import Invoices from "./pages/Invoices";
 import InvoiceDetail from "./pages/InvoiceDetail";
+
 
 
 const queryClient = new QueryClient();
@@ -38,6 +40,7 @@ const App = () => (
             <Route path="/payments" element={<Payments />} />
             <Route path="/vouchers" element={<ProcessVouchers />} />
             <Route path="/manage-vouchers" element={<ManageVouchers />} />
+            <Route path="/bilan" element={<Bilan />} />
             <Route path="/users" element={<Users />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/invoices" element={<Invoices />} />

@@ -36,7 +36,7 @@ type PaymentFormValues = z.infer<typeof formSchema>;
 const Payments: React.FC = () => {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [profits, setProfits] = useState<ProductProfit[]>([]);
+  const [profits, setProfits] = useState<ProductProfit[]>([]); 
   
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(formSchema),
@@ -149,10 +149,10 @@ const Payments: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Changement de 3 à 4 colonnes */}
-            <CashDrawer className="col-span-1 md:col-span-2" /> {/* Caisse agrandie (3 colonnes au lieu de 1) */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <CashDrawer className="col-span-1 md:col-span-2" />
             
-            <Card className="col-span-2"> {/* Formulaire réduit à 1 colonne */}
+            <Card className="col-span-2">
               <CardHeader>
                 <CardTitle>Traiter un Paiement</CardTitle>
                 <CardDescription>Entrez un numéro de facture pour traiter le paiement</CardDescription>
@@ -230,8 +230,6 @@ const Payments: React.FC = () => {
               )}
             </Card>
           </div>
-
-          
         </div>
       </div>
     </MainLayout>

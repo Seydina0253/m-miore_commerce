@@ -15,14 +15,17 @@ interface CashDrawerData {
   totalCash: number;
   paymentsIn: number;
   vouchersOut: number;
+  vouchersIn: number;
   period: "day" | "week" | "month" | "year";
   selectedDate?: Date;
+  previousDayCash?: number;
 }
 
 interface DailyTransaction {
   date: string;
   cashIn: number;
   cashOut: number;
+  dailyCash: number;
   voucherDetails?: VoucherDetail[];
 }
 
@@ -43,6 +46,7 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
     totalCash: 0,
     paymentsIn: 0,
     vouchersOut: 0,
+    vouchersIn: 0,
     period: "day"
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +55,12 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
 
   useEffect(() => {
     fetchCashDrawerData(cashData.period, date);
+    
+    const interval = setInterval(() => {
+      fetchCashDrawerData(cashData.period, date);
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, [cashData.period, date]);
 
   const fetchCashDrawerData = async (period: "day" | "week" | "month" | "year", selectedDate?: Date) => {
@@ -58,17 +68,19 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
     try {
       const dateParam = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined;
       
-      // Get payments summary
       const paymentsResponse = await axios.get("http://localhost/Backend_Mem/payments.php", {
-        params: { cashDrawer: true, period, date: dateParam }
+        params: { 
+          cashDrawer: true, 
+          period, 
+          date: dateParam,
+          dailyMode: true
+        }
       });
 
-      // Get vouchers summary
       const vouchersResponse = await axios.get("http://localhost/Backend_Mem/vouchers.php", {
         params: { summary: true, period, date: dateParam }
       });
 
-      // Get detailed transactions for selected date if in details view
       if (selectedDate) {
         const detailsResponse = await axios.get("http://localhost/Backend_Mem/vouchers.php", {
           params: { dailyDetails: true, date: dateParam }
@@ -79,12 +91,17 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
         }
       }
 
+      const responseData = paymentsResponse.data;
+      const voucherData = vouchersResponse.data.summary || {};
+      
       setCashData({
-        totalCash: vouchersResponse.data.cashDrawer.totalCash,
-        paymentsIn: paymentsResponse.data.cashIn || 0, // Corrected value directly from API
-        vouchersOut: vouchersResponse.data.summary.processedAmount || 0,
+        totalCash: responseData.dailyCash || 0,
+        paymentsIn: responseData.cashIn || 0,
+        vouchersOut: (voucherData.expenseAmount || 0) + (voucherData.outputAmount || 0),
+        vouchersIn: voucherData.entryAmount || 0,
         period,
-        selectedDate
+        selectedDate,
+        previousDayCash: responseData.previousDayCash || 0
       });
 
     } catch (error) {
@@ -96,10 +113,15 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
   };
 
   const handlePeriodChange = (newPeriod: string) => {
+    const newPeriodType = newPeriod as "day" | "week" | "month" | "year";
     setCashData({
       ...cashData,
-      period: newPeriod as "day" | "week" | "month" | "year"
+      period: newPeriodType
     });
+    
+    if (newPeriodType !== "day") {
+      setDate(new Date());
+    }
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
@@ -131,69 +153,91 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
     }
   };
 
+  const getDailyBalance = () => {
+    return cashData.paymentsIn + cashData.vouchersIn - cashData.vouchersOut;
+  };
+
+  const getVoucherTypeText = (type: string) => {
+    switch (type) {
+      case 'expense': return 'Dépense';
+      case 'output': return 'Sortie';
+      case 'entry': return 'Entrée';
+      default: return type;
+    }
+  };
+
+  const getVoucherTypeColor = (type: string) => {
+    switch (type) {
+      case 'expense': return 'text-red-600';
+      case 'output': return 'text-blue-600';
+      case 'entry': return 'text-green-600';
+      default: return 'text-gray-600';
+    }
+  };
+
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Caisse</CardTitle>
-        <CardDescription>Solde actuel et transactions</CardDescription>
+        <CardTitle>Caisse Journalière</CardTitle>
       </CardHeader>
       <div style={{ margin: '17px' }}>
-      <div className="ml-1" >
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 h-10"
-                >
-                  <CalendarIcon className="h-4 w-4" />
-                  {date ? format(date, "dd/MM/yyyy") : "Sélectionner"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          </div>
-          
-      <CardContent className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Tabs defaultValue="day" value={cashData.period} onValueChange={handlePeriodChange} className="flex-1">
-            <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="day">Jour</TabsTrigger>
-              <TabsTrigger value="week">Semaine</TabsTrigger>
-              <TabsTrigger value="month">Mois</TabsTrigger>
-              <TabsTrigger value="year">Année</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
-          
+        <div className="ml-1">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 h-10"
+              >
+                <CalendarIcon className="h-4 w-4" />
+                {date ? format(date, "dd/MM/yyyy") : "Sélectionner"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={handleDateSelect}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
+      </div>
+          
+      <CardContent className="space-y-2">
         
 
         <div className="bg-blue-50 p-4 rounded-md">
-          <p className="text-sm text-blue-700 font-medium">Solde Actuel</p>
+          <p className="text-sm text-blue-700 font-medium">
+            {cashData.period === "day" ? "Solde Journalier" : `Solde ${getPeriodLabel()}`}
+          </p>
           <p className="text-2xl font-bold text-blue-900">
             {isLoading ? "Chargement..." : formatCurrency(cashData.totalCash)}
           </p>
+          {cashData.period === "day" && (
+            <p className="text-xs text-blue-600 mt-1">
+            </p>
+          )}
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           <div className="bg-green-50 p-3 rounded-md">
-            <p className="text-xs text-green-700 font-medium">Entrées {getPeriodLabel()}</p>
+            <p className="text-xs text-green-700 font-medium">Factures {getPeriodLabel()}</p>
             <p className="text-lg font-bold text-green-900">
               {isLoading ? "..." : formatCurrency(cashData.paymentsIn)}
             </p>
           </div>
           
+          <div className="bg-emerald-50 p-3 rounded-md">
+            <p className="text-xs text-emerald-700 font-medium">Bons d'Entrée {getPeriodLabel()}</p>
+            <p className="text-lg font-bold text-emerald-900">
+              {isLoading ? "..." : formatCurrency(cashData.vouchersIn)}
+            </p>
+          </div>
+          
           <div className="bg-red-50 p-3 rounded-md">
-            <p className="text-xs text-red-700 font-medium">Sorties {getPeriodLabel()}</p>
+            <p className="text-xs text-red-700 font-medium">Bons de Sortie {getPeriodLabel()}</p>
             <p className="text-lg font-bold text-red-900">
               {isLoading ? "..." : formatCurrency(cashData.vouchersOut)}
             </p>
@@ -203,7 +247,7 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
         <Tabs defaultValue="summary">
           <TabsList className="w-full">
             <TabsTrigger value="summary" className="flex-1">Résumé</TabsTrigger>
-            
+            <TabsTrigger value="details" className="flex-1">Détails</TabsTrigger>
           </TabsList>
           
           <TabsContent value="summary" className="pt-4">
@@ -213,13 +257,25 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
                 <span>{formatCurrency(cashData.paymentsIn)}</span>
               </li>
               <li className="flex justify-between">
-                <span>Total des bons traités:</span>
-                <span>{formatCurrency(cashData.vouchersOut)}</span>
+                <span>Total des bons d'entrée traités:</span>
+                <span className="text-green-600">{formatCurrency(cashData.vouchersIn)}</span>
+              </li>
+              <li className="flex justify-between">
+                <span>Total des bons de sortie traités:</span>
+                <span className="text-red-600">{formatCurrency(cashData.vouchersOut)}</span>
               </li>
               <li className="flex justify-between font-semibold pt-2 border-t">
-                <span>Balance:</span>
-                <span>{formatCurrency(cashData.paymentsIn - cashData.vouchersOut)}</span>
+                <span>Balance {cashData.period === "day" ? "journalière" : "de la période"}:</span>
+                <span className={getDailyBalance() >= 0 ? "text-green-600" : "text-red-600"}>
+                  {formatCurrency(getDailyBalance())}
+                </span>
               </li>
+              {cashData.period === "day" && cashData.previousDayCash !== undefined && (
+                <li className="flex justify-between text-xs text-gray-500 pt-1">
+                  <span>Solde jour précédent:</span>
+                  <span>{formatCurrency(cashData.previousDayCash)}</span>
+                </li>
+              )}
             </ul>
           </TabsContent>
           
@@ -236,10 +292,12 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
                         <div>
                           <span className="text-sm font-medium">{voucher.voucherNumber}</span>
                           <span className="text-xs ml-2 px-2 py-0.5 rounded-full bg-gray-100">
-                            {voucher.type === 'expense' ? 'Dépense' : 'Sortie'}
+                            {getVoucherTypeText(voucher.type)}
                           </span>
                         </div>
-                        <span className="text-sm font-medium text-red-600">{formatCurrency(voucher.amount)}</span>
+                        <span className={`text-sm font-medium ${getVoucherTypeColor(voucher.type)}`}>
+                          {voucher.type === 'entry' ? '+' : '-'}{formatCurrency(voucher.amount)}
+                        </span>
                       </div>
                       <p className="text-xs text-gray-500 truncate">{voucher.description}</p>
                     </div>
@@ -249,40 +307,6 @@ const CashDrawer: React.FC<CashDrawerProps> = ({ className }) => {
             ) : (
               <div className="text-sm text-center text-gray-500">
                 Aucun bon traité pour la période sélectionnée.
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="calendar" className="pt-4">
-            <div className="text-center mb-3">
-              <p className="text-sm font-medium">Sélectionnez une date dans le calendrier pour voir les détails</p>
-            </div>
-            
-            <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={handleDateSelect}
-                className="p-3 pointer-events-auto border rounded-md"
-              />
-            </div>
-            
-            {cashData.selectedDate && (
-              <div className="mt-4 space-y-2 border-t pt-2">
-                <h3 className="font-medium text-sm mb-2">
-                  Transactions du {format(cashData.selectedDate, 'd MMMM yyyy', { locale: fr })}
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-2 bg-green-50 rounded">
-                    <p className="text-xs text-green-700">Entrées</p>
-                    <p className="text-sm font-bold">{formatCurrency(dailyTransactions?.cashIn || 0)}</p>
-                  </div>
-                  
-                  <div className="p-2 bg-red-50 rounded">
-                    <p className="text-xs text-red-700">Sorties</p>
-                    <p className="text-sm font-bold">{formatCurrency(dailyTransactions?.cashOut || 0)}</p>
-                  </div>
-                </div>
               </div>
             )}
           </TabsContent>

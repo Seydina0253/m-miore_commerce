@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/select";
 
 const formSchema = z.object({
-  type: z.enum(["expense", "output"]),
+  type: z.enum(["expense", "output", "entry"]),
   amount: z.coerce.number().positive("Le montant doit être positif"),
   description: z.string().min(5, "La description doit contenir au moins 5 caractères"),
 });
@@ -30,7 +31,7 @@ const formSchema = z.object({
 type VoucherFormValues = z.infer<typeof formSchema>;
 
 interface VoucherFormProps {
-  onSubmit: (data: VoucherFormValues) => void;
+  onSubmit: (data: VoucherFormValues & { voucher_number: string }) => void;
   isLoading?: boolean;
 }
 
@@ -48,12 +49,14 @@ const VoucherForm: React.FC<VoucherFormProps> = ({
   });
 
   const handleSubmit = (values: VoucherFormValues) => {
-    onSubmit(values);
-    form.reset(); // Réinitialise le formulaire après soumission
+    // Generate a temporary voucher_number for submission
+    const tempVoucherNumber = "TEMP-" + Date.now();
+    onSubmit({ ...values, voucher_number: tempVoucherNumber });
+    form.reset();
   };
 
   return (
-    <div  className="col-span-1 md:col-span-4"> {/* Augmentez la largeur de la carte ici */}
+    <div className="col-span-1 md:col-span-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField
@@ -74,6 +77,7 @@ const VoucherForm: React.FC<VoucherFormProps> = ({
                   <SelectContent>
                     <SelectItem value="expense">Bon de Dépense</SelectItem>
                     <SelectItem value="output">Bon de Sortie</SelectItem>
+                    <SelectItem value="entry">Bon d'Entrée</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

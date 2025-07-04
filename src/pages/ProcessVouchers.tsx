@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Voucher } from "@/types";
@@ -113,6 +114,45 @@ const ProcessVouchers: React.FC = () => {
     }
   };
   
+  const getVoucherTypeText = (type: string) => {
+    switch (type) {
+      case "expense":
+        return "Dépense";
+      case "output":
+        return "Sortie";
+      case "entry":
+        return "Entrée";
+      default:
+        return type;
+    }
+  };
+  
+  const getVoucherTypeColor = (type: string) => {
+    switch (type) {
+      case "expense":
+        return 'bg-amber-50';
+      case "output":
+        return 'bg-blue-50';
+      case "entry":
+        return 'bg-green-50';
+      default:
+        return 'bg-gray-50';
+    }
+  };
+  
+  const getVoucherTypeBadgeColor = (type: string) => {
+    switch (type) {
+      case "expense":
+        return 'bg-amber-100 text-amber-800';
+      case "output":
+        return 'bg-blue-100 text-blue-800';
+      case "entry":
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-CM", {
       style: "currency",
@@ -137,13 +177,13 @@ const ProcessVouchers: React.FC = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-vente-dark">Traiter les Bons</h1>
-          <p className="text-vente-gray mt-1">Traiter les bons de dépense et de sortie</p>
+          <p className="text-vente-gray mt-1">Traiter les bons de dépense, de sortie et d'entrée</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Changé de 3 à 4 colonnes */}
-          <CashDrawer className="col-span-1 md:col-span-2" /> {/* Caisse agrandie (3 colonnes au lieu de 1) */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <CashDrawer className="col-span-1 md:col-span-2" />
           
-          <Card className="col-span-2"> {/* Formulaire réduit à 1 colonne */}
+          <Card className="col-span-2">
             <CardHeader>
               <CardTitle>Traiter un Bon</CardTitle>
               <CardDescription>Entrez un numéro de bon pour le traiter</CardDescription>
@@ -151,17 +191,11 @@ const ProcessVouchers: React.FC = () => {
             <CardContent>
               {currentVoucher ? (
                 <div className="space-y-4">
-                  <div className={`p-4 rounded-md ${
-                    currentVoucher.type === 'expense' ? 'bg-amber-50' : 'bg-blue-50'
-                  }`}>
+                  <div className={`p-4 rounded-md ${getVoucherTypeColor(currentVoucher.type)}`}>
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="font-semibold">{currentVoucher.voucher_number}</h3>
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        currentVoucher.type === 'expense' 
-                          ? 'bg-amber-100 text-amber-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {currentVoucher.type === 'expense' ? 'Dépense' : 'Sortie'}
+                      <span className={`px-2 py-1 rounded text-xs ${getVoucherTypeBadgeColor(currentVoucher.type)}`}>
+                        {getVoucherTypeText(currentVoucher.type)}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">Date: {formatDate(currentVoucher.date)}</p>

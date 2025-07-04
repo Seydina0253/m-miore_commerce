@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 export interface SalesStatsData {
@@ -22,11 +21,13 @@ export interface StatisticsData {
 
 export const fetchStatisticsData = async (): Promise<StatisticsData> => {
   try {
-    const response = await axios.get('http://localhost/Backend_Mem/dashboard.php?stats=true');
+    // Fetch daily statistics like dashboard
+    const response = await fetch('http://localhost/Backend_Mem/dashboard.php?stats=true&daily=true');
+    const data = await response.json();
     
     // Calculate average order value
-    const averageOrderValue = response.data.ordersCount > 0 
-      ? response.data.totalSales / response.data.ordersCount 
+    const averageOrderValue = data.ordersCount > 0 
+      ? data.totalSales / data.ordersCount 
       : 0;
     
     // For conversion rate, we'll use a mock value (typically this would come from analytics)
@@ -34,9 +35,9 @@ export const fetchStatisticsData = async (): Promise<StatisticsData> => {
     const conversionRate = 8.5;
     
     return {
-      totalSales: response.data.totalSales,
+      totalSales: data.totalSales,
       averageOrderValue: averageOrderValue,
-      totalProducts: response.data.productsCount,
+      totalProducts: data.productsCount,
       conversionRate: conversionRate
     };
   } catch (error) {

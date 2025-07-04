@@ -69,7 +69,7 @@ export interface PaginationMeta {
 
 export interface Voucher {
   id: string;
-  type: "expense" | "output";
+  type: "expense" | "output" | "entry";
   amount: number;
   voucher_number: string;
   date: string;

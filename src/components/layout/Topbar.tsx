@@ -82,6 +82,12 @@ const Topbar = () => {
                 >
                   Process Vouchers
                 </a>
+                <a 
+                  href="/bilan" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-vente-dark hover:bg-vente-secondary"
+                >
+                  Bilan
+                </a>
               </>
             )}
             {user?.role === "gestionnaire_bon" && (

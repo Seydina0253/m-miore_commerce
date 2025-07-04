@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import VoucherForm from "@/components/vouchers/VoucherForm";
@@ -52,7 +53,7 @@ const ManageVouchers: React.FC = () => {
     try {
       const response = await axios.post("http://localhost/Backend_Mem/vouchers.php", {
         ...data,
-        voucher_number: data.voucher_number, // Use voucher_number
+        voucher_number: data.voucher_number,
       });
       
       if (response.data.success) {
@@ -85,20 +86,17 @@ const ManageVouchers: React.FC = () => {
     if (!selectedVoucher) return;
     
     try {
-      // Mark voucher as printed if it isn't already
       if (!selectedVoucher.printed) {
         await axios.put("http://localhost/Backend_Mem/vouchers.php", {
-          voucher_number: selectedVoucher.voucher_number, // Change to voucher_number
+          voucher_number: selectedVoucher.voucher_number,
           printed: true
         });
         
-        // Update local state
         setVouchers(vouchers.map(v => 
           v.voucher_number === selectedVoucher.voucher_number ? { ...v, printed: true } : v
         ));
       }
       
-      // Open PDF in new tab
       window.open(`http://localhost/Backend_Mem/vouchers.php?voucher_number=${selectedVoucher.voucher_number}&pdf=true`, '_blank');
       
     } catch (error) {
@@ -124,6 +122,19 @@ const ManageVouchers: React.FC = () => {
     }
   };
   
+  const getVoucherTypeText = (type: string) => {
+    switch (type) {
+      case "expense":
+        return "Dépense";
+      case "output":
+        return "Sortie";
+      case "entry":
+        return "Entrée";
+      default:
+        return type;
+    }
+  };
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("fr-FR", {
@@ -145,13 +156,14 @@ const ManageVouchers: React.FC = () => {
   
   const expenseVouchers = vouchers.filter(v => v.type === "expense");
   const outputVouchers = vouchers.filter(v => v.type === "output");
+  const entryVouchers = vouchers.filter(v => v.type === "entry");
 
   return (
     <MainLayout requiredRole="gestionnaire_bon">
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-vente-dark">Gestion des Bons</h1>
-          <p className="text-vente-gray mt-1">Créez et gérez les bons de dépense et de sortie</p>
+          <p className="text-vente-gray mt-1">Créez et gérez les bons de dépense, de sortie et d'entrée</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -168,6 +180,7 @@ const ManageVouchers: React.FC = () => {
                 <TabsTrigger value="all">Tous les Bons</TabsTrigger>
                 <TabsTrigger value="expense">Bons de Dépense</TabsTrigger>
                 <TabsTrigger value="output">Bons de Sortie</TabsTrigger>
+                <TabsTrigger value="entry">Bons d'Entrée</TabsTrigger>
               </TabsList>
               
               <TabsContent value="all" className="mt-4">
@@ -193,9 +206,9 @@ const ManageVouchers: React.FC = () => {
                       ) : vouchers.length > 0 ? (
                         vouchers.map((voucher) => (
                           <TableRow key={voucher.id}>
-                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell> {/* Change to voucher_number */}
+                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell>
                             <TableCell className="capitalize">
-                              {voucher.type === "expense" ? "Dépense" : "Sortie"}
+                              {getVoucherTypeText(voucher.type)}
                             </TableCell>
                             <TableCell>{formatCurrency(voucher.amount)}</TableCell>
                             <TableCell>{formatDate(voucher.date)}</TableCell>
@@ -248,7 +261,7 @@ const ManageVouchers: React.FC = () => {
                       ) : expenseVouchers.length > 0 ? (
                         expenseVouchers.map((voucher) => (
                           <TableRow key={voucher.id}>
-                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell> {/* Change to voucher_number */}
+                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell>
                             <TableCell>{formatCurrency(voucher.amount)}</TableCell>
                             <TableCell>{voucher.description}</TableCell>
                             <TableCell>{formatDate(voucher.date)}</TableCell>
@@ -301,7 +314,7 @@ const ManageVouchers: React.FC = () => {
                       ) : outputVouchers.length > 0 ? (
                         outputVouchers.map((voucher) => (
                           <TableRow key={voucher.id}>
-                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell> {/* Change to voucher_number */}
+                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell>
                             <TableCell>{formatCurrency(voucher.amount)}</TableCell>
                             <TableCell>{voucher.description}</TableCell>
                             <TableCell>{formatDate(voucher.date)}</TableCell>
@@ -330,12 +343,64 @@ const ManageVouchers: React.FC = () => {
                   </Table>
                 </div>
               </TabsContent>
+              
+              <TabsContent value="entry" className="mt-4">
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Numéro</TableHead>
+                        <TableHead>Montant</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            Chargement des bons...
+                          </TableCell>
+                        </TableRow>
+                      ) : entryVouchers.length > 0 ? (
+                        entryVouchers.map((voucher) => (
+                          <TableRow key={voucher.id}>
+                            <TableCell className="font-medium">{voucher.voucher_number}</TableCell>
+                            <TableCell>{formatCurrency(voucher.amount)}</TableCell>
+                            <TableCell>{voucher.description}</TableCell>
+                            <TableCell>{formatDate(voucher.date)}</TableCell>
+                            <TableCell>{getStatusBadge(voucher.status)}</TableCell>
+                            <TableCell>
+                              <Button 
+                                size="sm" 
+                                variant={voucher.printed ? "outline" : "default"}
+                                className="flex items-center gap-2"
+                                onClick={() => openPrintDialog(voucher)}
+                              >
+                                <Printer className="h-4 w-4" />
+                                {voucher.printed ? "Réimprimer" : "Imprimer"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                            Aucun bon d'entrée trouvé
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
             </Tabs>
           </div>
         </div>
       </div>
 
-      {/* Modal d'impression */}
       <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -348,16 +413,20 @@ const ManageVouchers: React.FC = () => {
           {selectedVoucher && (
             <div className="space-y-6 py-4">
               <div className={`p-4 rounded-md ${
-                selectedVoucher.type === 'expense' ? 'bg-amber-50' : 'bg-blue-50'
+                selectedVoucher.type === 'expense' ? 'bg-amber-50' : 
+                selectedVoucher.type === 'entry' ? 'bg-green-50' : 'bg-blue-50'
               }`}>
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">{selectedVoucher.voucher_number}</h3>
                   <span className={`px-2 py-1 rounded text-xs ${
                     selectedVoucher.type === 'expense' 
                       ? 'bg-amber-100 text-amber-800' 
+                      : selectedVoucher.type === 'entry'
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-blue-100 text-blue-800'
                   }`}>
-                    {selectedVoucher.type === 'expense' ? 'Bon de Dépense' : 'Bon de Sortie'}
+                    {selectedVoucher.type === 'expense' ? 'Bon de Dépense' : 
+                     selectedVoucher.type === 'entry' ? 'Bon d\'Entrée' : 'Bon de Sortie'}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">Date: {formatDate(selectedVoucher.date)}</p>
