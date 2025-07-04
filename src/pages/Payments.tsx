@@ -224,7 +224,7 @@ const Payments: React.FC = () => {
                 )}
               </CardContent>
               {!currentOrder && (
-                <CardFooter className="text-sm text-gray-500">
+                <CardFooter className="text-sm text-gray-501">
                   Entrez le numéro de facture exact (ex: 0000) 
                 </CardFooter>
               )}
@@ -234,6 +234,6 @@ const Payments: React.FC = () => {
       </div>
     </MainLayout>
   );
-};
+}; 
 
 export default Payments;
